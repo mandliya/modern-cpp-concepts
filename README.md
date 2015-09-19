@@ -1,4 +1,8 @@
-## C++ Parsing Problem
+## Modern C++ Concepts
+
+### Concept 1 : Variable Initilization in C++11/14
+
+#### C++ Parsing Problem
 
 ```c++
 class ExampleClass {
@@ -33,7 +37,7 @@ main.cpp:14:21: note: add a pair of parentheses to declare a variable
 
 Weird ha!
 
-###Uniform Initialization
+####Uniform Initialization
 
 To fix this, C++11 has provided *Uniform Initialization*. The code with uniform initialization will look like this.
 
@@ -57,7 +61,7 @@ int main()
 Boom! Compiler is no more confused.
 
 
-###Narrowing Conversion
+####Narrowing Conversion
 *Uniform initialization* also prevent narrowing conversion. Lets take this example.
 
 ```c++
