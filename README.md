@@ -1,6 +1,6 @@
 ## Modern C++ Concepts
 
-### Concept 1 : Variable Initilization in C++11/14
+### Concept 1 : Variable Initilization in C++11/14 ([Code](variable-initialization))
 
 #### C++ Parsing Problem
 
