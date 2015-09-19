@@ -95,7 +95,7 @@ int main()
 
 This will be compiled easily.
 
-#### Concept 2 : Initializer Lists ([code](initializer-lists))
+### Concept 2 : Initializer Lists ([code](initializer-lists))
 
 Initialization lists are used when you want to construct objects from multiple objects of a given type. C++11 provides initialization lists for this. We can supply many objects of same time together to a constructor. Initializer list are built upon [uniform initialization](variable-initialization/new-variable-initialization.cpp). Let's see following vector example.
 
