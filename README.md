@@ -9,8 +9,8 @@ class ExampleClass {
   private:
     int m_Member;
   public:
-    ExampleClass() = default
-    MyClass( const MyClass& rhs) = default
+    ExampleClass() = default;
+    MyClass( const MyClass& rhs) = default;
 };
 
 int main()
@@ -46,8 +46,8 @@ class ExampleClass {
   private:
     int m_Member;
   public:
-    ExampleClass() = default
-    MyClass( const MyClass& rhs) = default
+    ExampleClass() = default;
+    MyClass( const MyClass& rhs) = default;
 };
 
 int main()
@@ -86,9 +86,9 @@ This code will not compile, and compiler will throw bunch of errors. If we look 
 int main()
 {
   int anInt{ 100 };
-  char aChar{ static_cast<char>(512) }
-  double aDouble{ 1.0 }
-  float aFloat{ static_cast<float>(aDouble) }
+  char aChar{ static_cast<char>(512) };
+  double aDouble{ 1.0 };
+  float aFloat{ static_cast<float>(aDouble) };
   return 0;
 }
 ```
@@ -133,3 +133,127 @@ std::initializer_list<int> aList{ 1, 10 };
 std::vector<int> vectorD( aList ); // or std::vector<int> vectorD{ aList };
 ```
 The vector constructor implicitly creates a initializer_list when we initialized *vectorC* using uniform initialization.
+
+### Concept 3 : Deducing type of the object. ([code](type-deduction))
+
+Modern C++ provides type deduction for determining the type of objects. It provides *auto* keyword and *typeid* method to determine types. Example.
+
+```c++
+#include <iostream>
+
+int main()
+{
+  auto variable = 5.5;
+  std::cout << "Type of Variable: " << typeid(variable).name() << std::endl;
+  return 0;
+}
+```
+We will see output of above program ( on clang )
+```c++
+Type of Variable: d
+```
+
+**d** here is clang's internal representation of **double** type. If you pass the above output of *c++filt* you will see the output as
+
+```
+Ravis-MacBook-Pro:type-deduction mandliya$ ./run | c++filt -t
+Type of Variable: double
+```
+So what happened here. **auto** keyword based on the initializing object determined that variable is of type double. (Since we initialized variable with 5.5), and **typeid** provided us the internal type compiler assigned to variable which is than later translated by *c++filt*.
+
+### auto for user created object types.
+Let's use *auto* for user created objects.
+
+```c++
+#include <iostream>
+#include <typeinfo>
+
+class ExampleClass { };
+
+int main()
+{
+  auto var = ExampleClass();
+  std::cout << "Type of Variable: " << typeid(var).name() << std::endl;
+  return 0;
+}
+```
+Here the var is of type *ExampleClass* and using *c++filt* we get exactly that
+
+```c++
+Ravis-MacBook-Pro:type-deduction mandliya$ ./run | c++filt -t
+Type of Variable: ExampleClass
+```
+
+#### auto with initializer list
+
+If our object is initialized using initializer list (or to say using *uniform initialization*), then auto won't be that helpful. For example
+
+```c++
+#include <iostream>
+#include <typeinfo>
+
+class ExampleClass{ };
+
+int main() {
+
+  auto var1{ 4.5 };
+  std::cout << "Type of Variable: " << typeid(var1).name() << std::endl;
+
+  auto var2{ ExampleClass{ } };
+  std::cout << "Type of Variable: " << typeid(var2).name() << std::endl;
+
+  return 0;
+}
+```
+Output of above program in clang using c++filt
+
+```c++
+Ravis-MacBook-Pro:type-deduction mandliya$ ./run | c++filt -t
+Type of Variable: std::initializer_list<double>
+Type of Variable: std::initializer_list<ExampleClass>
+```
+
+Here, C++ uniform initialization will implicitly create initializer list to initialize *var1* and *var2*.
+It's best not to use uniform initialization when defining variables using auto. Use of auto for local variable is highly recommended as it is not possible to create an auto variable without initializing, so we will not have undefined local variables and it will quash bugs.
+
+####auto with functions
+
+Below code snippet will only work in **C++14** and later.
+```c++
+#include <iostream>
+
+template <typename T>
+auto doSomething( T parameter )
+{
+  return parameter;
+}
+
+int main()
+{
+  std::cout << "Type of Variable: " << typeid(doSomething(1.5)).name() << std::endl;
+  return 0;
+}
+```
+
+*doSomething* returns a double type in this call. In C++11 we will get this error.
+
+```
+Ravis-MacBook-Pro:type-deduction mandliya$ g++ -Wall -pedantic -Wextra -o run -std=c++11 auto-with-functions.cpp
+auto-with-functions.cpp:9:1: error: 'auto' return without trailing return type;
+      deduced return types are a C++14 extension
+auto doSomething( double parameter )
+```
+
+####auto with function and trailing return-type
+
+Another way to determine type of returning value of a function is using **decltype**. This method will work with C++11 and later.
+
+```c++
+template <typename T>
+auto doSomethingAgain( T parameter )->decltype(parameter)
+{
+  return parameter;
+}
+```
+
+Here we are using a *trailing return type* to decide return type of object. **decltype** is used to tell the compiler to use the type of a given expression. The expression can be a variable name however we could also give a function here and decltype would deduce the type returned from the function.
