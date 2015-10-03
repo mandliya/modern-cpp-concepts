@@ -257,3 +257,115 @@ auto doSomethingAgain( T parameter )->decltype(parameter)
 ```
 
 Here we are using a *trailing return type* to decide return type of object. **decltype** is used to tell the compiler to use the type of a given expression. The expression can be a variable name however we could also give a function here and decltype would deduce the type returned from the function.
+
+### Concept 4 : Move semantics
+Move semantics is one of the most powerful features introduced in C++11. Consider this code example.
+```c++
+T func(T o) {
+  //do something with o
+  return o
+}
+```
+
+This function is using concept of **call by value**. When this function is called, an object copy of 'o' of type T is constructed. And since it also returns an object of type T, another copy of 'o' is constructed for the return value. Thus for a call of *func* two new objects of type T are constructed. First one is temporary object which is destroyed as we return. (Objects are destroyed when control flow moves out of scope in which object was created.)
+
+What if, instead of creating new temporary object, we move data from one object to other directly. Let us understand first what are **rvalues** and **lvalues** in C++. Traditionally, any expression that **can appear** on the left side of an assignment is termed as *lvalue*. Likewise, an expression that **may only** appear on the right side is called *rvalue*. Note again that lvalue *can appear* on the left side of an assignment. It may also appear on the right side, but it's still an lvalue because it would be legal for it to appear on the left. That is how both lvalues and rvalues got their name. Specific to move semantics, we are discussing here, an rvalue can be *moved*.
+
+```c++
+a = b // a is lvalue and b is rvalue
+a =  b + c;
+//  ^ A nameless value
+```
+
+A temporary value that is ready to expire, it is also called an **xvalue** or an *expiring* value. A literal value is sometimes called **pure rvalue** or **prvalue**.
+```
+a = 42;
+// a is lvalue, 42 is prvalue.
+```
+ Typically *prvalue* category includes literal values and anything returned from a function that is not a reference. The one thing all of these type categories have in common is that they can be moved.
+
+ The C++ library provides a template function called move. It's used to tell the compiler to use an object as if it were an rvalue, which means that it makes it moveable. Let's see an example.
+
+ ```c++
+ #include <iostream>
+ #include <vector>
+
+ void printVec(std::vector<std::string> vec) {
+     std::cout << "Vector size:" << vec.size() << std::endl;
+     for (auto & str : vec ) {
+         std::cout << str << " ";
+     }
+     std::cout << std::endl;
+ }
+
+
+ int main(int argc, const char * argv[]) {
+
+     std::vector<std::string> vec1{ "One", "Two", "Three", "Four", "Five" };
+     std::vector<std::string> vec2{ "Six", "Seven", "Eight", "Nine", "Ten" };
+
+     //before move
+     printVec(vec1);
+     printVec(vec2);
+
+     vec2 = std::move(vec1);
+     std::cout << "Using std::move" << std::endl;
+
+     //before move
+     printVec(vec1);
+     printVec(vec2);
+
+
+     return 0;
+ }
+
+ ```
+Following is the output of above program
+```
+Vector size:5
+One Two Three Four Five
+Vector size:5
+Six Seven Eight Nine Ten
+
+
+Using std::move
+
+Vector size:0
+
+Vector size:5
+One Two Three Four Five
+```c++
+Clearly, contents of *vec1* are moved to *vec2* and *vec1* has become empty. *std::move* expects an argument which is castable to rvalue. Here, vector is castable. The other side of the equals sign, the thing that it's being moved to must support a move copy and in this case, vec2 does.
+
+Now, let's take another example, lets create our own swap function using std::move.
+
+```c++
+template<typename T>
+void swap(T & a, T & b)
+{
+    T tmp(std::move(a));
+    a(std::move(b));
+    b(std::move(tmp));
+}
+```
+
+Instead of calling *vec2 = std::move(vec1)* in above program, if we call *swap(vec1, vec2)*, The output would be like this
+
+```c++
+Vector size:5
+One Two Three Four Five
+Vector size:5
+Six Seven Eight Nine Ten
+
+
+Using std::move
+
+Vector size:5
+Six Seven Eight Nine Ten
+Vector size:5
+One Two Three Four Five
+```
+
+See, the contents of two vectors are swapped. *Tmp* in swap is destroyed once we move out of scope, however, in the swap, we did not actually copy anything, we just moved things aroud.
+
+to be continued ...
