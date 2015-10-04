@@ -321,7 +321,7 @@ a = 42;
 
  ```
 Following is the output of above program
-```
+```C++
 Vector size:5
 One Two Three Four Five
 Vector size:5
@@ -334,7 +334,7 @@ Vector size:0
 
 Vector size:5
 One Two Three Four Five
-```c++
+```
 Clearly, contents of *vec1* are moved to *vec2* and *vec1* has become empty. *std::move* expects an argument which is castable to rvalue. Here, vector is castable. The other side of the equals sign, the thing that it's being moved to must support a move copy and in this case, vec2 does.
 
 Now, let's take another example, lets create our own swap function using std::move.
