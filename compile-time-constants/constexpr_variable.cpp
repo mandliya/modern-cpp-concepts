@@ -7,5 +7,5 @@
 int main()
 {
   constexpr uint32_t MEMORY_SIZE{ 512 };
-  
+  std::cout << MEMORY_SIZE << std::endl;
 }
