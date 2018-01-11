@@ -61,7 +61,7 @@ int main()
 Boom! Compiler is no more confused.
 
 
-####Narrowing Conversion
+#### Narrowing Conversion
 **Uniform initialization** also prevent narrowing conversion. Lets take this example.
 
 ```c++
