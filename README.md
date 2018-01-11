@@ -37,7 +37,7 @@ main.cpp:14:21: note: add a pair of parentheses to declare a variable
 
 Weird ha!
 
-####Uniform Initialization
+#### Uniform Initialization
 
 To fix this, C++11 has provided **Uniform Initialization**. The code with uniform initialization will look like this.
 
