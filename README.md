@@ -184,9 +184,58 @@ Ravis-MacBook-Pro:type-deduction mandliya$ ./run | c++filt -t
 Type of Variable: ExampleClass
 ```
 
-#### auto with initializer list
+#### auto with initializer list ([code](type-deduction/auto-initializer-list.cpp))
 
-If our object is initialized using initializer list (or to say using *uniform initialization*), then auto won't be that helpful. For example
+In previous compiler versions, If our object is initialized using initializer list (or to say using *uniform initialization*), then auto won't be that helpful. For example
+
+```c++
+auto var1{ 4.5 };
+auto var2{ ExampleClass{ } };
+```
+used to give output of 
+
+```c++
+std::cout << "Type of Variable: " << typeid(var1).name() << std::endl;
+std::cout << "Type of Variable: " << typeid(var2).name() << std::endl;
+```
+as 
+
+```c++
+Ravis-MacBook-Pro:type-deduction mandliya$ ./run | c++filt -t
+Type of Variable: std::initializer_list<double>
+Type of Variable: std::initializer_list<ExampleClass>
+```
+
+However, after feedback, this is now changed to:
+
+```c++
+Ravis-MBP:type-deduction mandliya$ ./run | c++filt -t
+Type of Variable: double
+Type of Variable: ExampleClass
+```
+
+so for more than one element,  auto will detect them as appropriate initializer list.
+
+
+```c++
+auto int_initializer_list = {1, 2, 3};
+auto double_initiazer_list = {1.4, 1.2, 4.5};
+std::cout << "Type of the list:" << typeid(int_initializer_list).name() << std::endl;
+std::cout << "Type of the list:" << typeid(double_initializer_list).name() << std::endl;
+```
+Their types are deduced to:
+
+```c++
+Type of the list:std::initializer_list<int>
+Type of the list:std::initializer_list<double>
+```
+
+This is error as compiler will not be able to determine the type.
+```c++
+auto error_initializer_list = {4.5 , 5, 2.4f};
+```
+
+Complete example:
 
 ```c++
 #include <iostream>
@@ -202,21 +251,37 @@ int main() {
   auto var2{ ExampleClass{ } };
   std::cout << "Type of Variable: " << typeid(var2).name() << std::endl;
 
+   // std::initializer_list<int>
+  auto int_initializer_list = {1, 2, 3};
+  std::cout << "Type of the list:" << typeid(int_initializer_list).name() << std::endl;
+
+  // we can initialize a vector with it.
+  std::vector<int> vec = int_initializer_list;
+  std::cout << "Type of the vector:" << typeid(vec).name() << std::endl;
+
+  // C++17 only: similar initializer list for double
+  auto double_initializer_list = {1.2, 1.3 , 1.4};
+  std::cout << "Type of the list:" << typeid(double_initializer_list).name() << std::endl;
+
+  // However this would be error, as types are not of same type.
+  // auto error_initializer_list = {4.5 , 5, 2.4f};
+
   return 0;
 }
 ```
 Output of above program in clang using c++filt
 
 ```c++
-Ravis-MacBook-Pro:type-deduction mandliya$ ./run | c++filt -t
-Type of Variable: std::initializer_list<double>
-Type of Variable: std::initializer_list<ExampleClass>
+Ravis-MBP:type-deduction mandliya$ ./run | c++filt -t
+Type of Variable: double
+Type of Variable: ExampleClass
+Type of the list:std::initializer_list<int>
+Type of the vector:std::__1::vector<int, std::__1::allocator<int> >
+Printing int vector created with auto deduced initializer list:1 2 3
+Type of the list:std::initializer_list<double>
 ```
 
-Here, C++ uniform initialization will implicitly create initializer list to initialize *var1* and *var2*.
-It's best not to use uniform initialization when defining variables using auto. Use of auto for local variable is highly recommended as it is not possible to create an auto variable without initializing, so we will not have undefined local variables and it will quash bugs.
-
-####auto with functions
+#### auto with functions
 
 Below code snippet will only work in **C++14** and later.
 ```c++
@@ -366,6 +431,28 @@ Vector size:5
 One Two Three Four Five
 ```
 
-See, the contents of two vectors are swapped. *Tmp* in swap is destroyed once we move out of scope, however, in the swap, we did not actually copy anything, we just moved things aroud.
+See, the contents of two vectors are swapped. *Tmp* in swap is destroyed once we move out of scope, however, in the swap, we did not actually copy anything, we just moved things around.
 
-to be continued ...
+We will get back to move semantics again.
+
+### Concept 5 : Easier nested namespace syntax (C++17) ([code]((easier-nested-namespace/easier-nested-namespace.cpp)))
+
+The usual way of nested namespace syntax till C++14 is:
+```c++
+namespace game {
+  namespace engine {
+    namespace player {
+      namespace action {
+        int move;
+      }
+    }
+  }
+}
+```
+For a larger application, this could get a little cumbersome. In c++ 17, the easier nested namespace syntax is introduced. So the above nested namespace could be declared as:
+```c++
+namespace game::engine::player::action {
+  int move;
+}
+```
+Complete example could be found [here](easier-nested-namespace/easier-nested-namespace.cpp).
