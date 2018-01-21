@@ -235,41 +235,7 @@ This is error as compiler will not be able to determine the type.
 auto error_initializer_list = {4.5 , 5, 2.4f};
 ```
 
-Complete example:
-
-```c++
-#include <iostream>
-#include <typeinfo>
-
-class ExampleClass{ };
-
-int main() {
-
-  auto var1{ 4.5 };
-  std::cout << "Type of Variable: " << typeid(var1).name() << std::endl;
-
-  auto var2{ ExampleClass{ } };
-  std::cout << "Type of Variable: " << typeid(var2).name() << std::endl;
-
-   // std::initializer_list<int>
-  auto int_initializer_list = {1, 2, 3};
-  std::cout << "Type of the list:" << typeid(int_initializer_list).name() << std::endl;
-
-  // we can initialize a vector with it.
-  std::vector<int> vec = int_initializer_list;
-  std::cout << "Type of the vector:" << typeid(vec).name() << std::endl;
-
-  // C++17 only: similar initializer list for double
-  auto double_initializer_list = {1.2, 1.3 , 1.4};
-  std::cout << "Type of the list:" << typeid(double_initializer_list).name() << std::endl;
-
-  // However this would be error, as types are not of same type.
-  // auto error_initializer_list = {4.5 , 5, 2.4f};
-
-  return 0;
-}
-```
-Output of above program in clang using c++filt
+Complete example is [here](type-deduction/auto-initializer-list.cpp) whose output in clang using c++filt
 
 ```c++
 Ravis-MBP:type-deduction mandliya$ ./run | c++filt -t
