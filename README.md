@@ -435,7 +435,7 @@ See, the contents of two vectors are swapped. *Tmp* in swap is destroyed once we
 
 We will get back to move semantics again.
 
-### Concept 5 : Easier nested namespace syntax (C++17) ([code]((easier-nested-namespace/easier-nested-namespace.cpp)))
+### Concept 5 : Easier nested namespace syntax (C++17) ([code](easier-nested-namespace/easier-nested-namespace.cpp)))
 
 The usual way of nested namespace syntax till C++14 is:
 ```c++
