@@ -214,7 +214,7 @@ Type of Variable: double
 Type of Variable: ExampleClass
 ```
 
-so for more than one element,  auto will detect them as appropriate initializer list.
+so for more than one elements,  auto will detect them as appropriate initializer list.
 
 
 ```c++
@@ -279,7 +279,7 @@ Type of the list:std::initializer_list<int>
 Type of the vector:std::__1::vector<int, std::__1::allocator<int> >
 Printing int vector created with auto deduced initializer list:1 2 3
 Type of the list:std::initializer_list<double>
-```
+``` 
 
 #### auto with functions
 
@@ -309,7 +309,7 @@ auto-with-functions.cpp:9:1: error: 'auto' return without trailing return type;
 auto doSomething( double parameter )
 ```
 
-####auto with function and trailing return-type
+#### auto with function and trailing return-type
 
 Another way to determine type of returning value of a function is using **decltype**. This method will work with C++11 and later.
 
@@ -323,7 +323,7 @@ auto doSomethingAgain( T parameter )->decltype(parameter)
 
 Here we are using a *trailing return type* to decide return type of object. **decltype** is used to tell the compiler to use the type of a given expression. The expression can be a variable name however we could also give a function here and decltype would deduce the type returned from the function.
 
-### Concept 4 : Move semantics
+### Concept 4 : Move semantics ([code](move-semantics/))
 Move semantics is one of the most powerful features introduced in C++11. Consider this code example.
 ```c++
 T func(T o) {
