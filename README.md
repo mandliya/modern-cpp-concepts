@@ -422,3 +422,42 @@ namespace game::engine::player::action {
 }
 ```
 Complete example could be found [here](easier-nested-namespace/easier-nested-namespace.cpp).
+
+### Concept 6: Static Assert at compile time. ([code](static_assert/static_assert.cpp))
+
+C++11 introduced static assert for compile time check. This helps in doing compile time checks to avoid building linking and then running to eventually fail some assumptions about the piece of code, or compiler behavior etc. For example checking for a version of a library which is declared as static const.
+
+```c++
+static const int major_version = 2;
+```
+Say version 3 of the library has new functions, and you need them for your project but you downloaded version 2 project. Now you compile your project,and the lib project link it and then eventually fail after 30 minutes.
+
+Instead the below check would fail at compile time.
+
+```c++
+static_assert(lib::major_version > 2, "You are using version less than 2, which might not have newer functionalities");
+```
+C++11 had a compulsory requirement for second argument, as string literal message, however C++17 has relaxed this requirement and made it optional. Now if you don't provide the argument, compiler will print a default message.
+
+```c++
+const int x = 3;
+const int y = 4;
+static_assert(x == y, "x should be equal to y); // This will not fail.
+static_assert(x > y, "x should be greater than y"); // This will fail at compile time.
+
+// This will work in C++17 but not in C++11 or C++14.
+static_assert(x < y);
+```
+
+Complete code example is [here](static_assert/static_assert.cpp). The compile time errors look like this.
+```c++
+Ravis-MBP:static_assert mandliya$ g++ -Wall -Wpedantic -o run -std=c++1z static_assert.cpp
+static_assert.cpp:12:5: error: static_assert failed "x should be greater than y"
+    static_assert(x > y, "x should be greater than y");
+    ^             ~~~~~
+static_assert.cpp:15:5: error: static_assert failed
+    static_assert(x < y);
+    ^             ~~~~~
+2 errors generated.
+```
+
