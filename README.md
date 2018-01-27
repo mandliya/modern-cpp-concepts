@@ -463,4 +463,15 @@ static_assert.cpp:15:5: error: static_assert failed
 ### Concept 7: std::invoke
 std::invoke is used to call functions, function pointers, and member pointers with the same syntax. This is generally called to any [Callable](http://en.cppreference.com/w/cpp/concept/Callable) object with/out parameters.
 
-.. to be continued.
+Example: 
+```c++
+void print_num(int i)
+{
+    std::cout << i << '\n';
+}
+
+.
+.
+.
+ std::invoke(print_num, 10);
+```
