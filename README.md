@@ -475,3 +475,5 @@ void print_num(int i)
 .
  std::invoke(print_num, 10);
 ```
+### Unnamed namespaces
+Modern C++ supports unknown namespaces.
